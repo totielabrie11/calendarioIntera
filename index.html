@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Calendario y Reloj</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<h1>Calendario y Reloj</h1>
+	<div class="calendar">
+		<div class="calendar-header">
+			<button id="prev-btn">&lt;</button>
+			<h2 id="calendar-month"></h2>
+			<button id="next-btn">&gt;</button>
+		</div>
+		<table id="calendar-table">
+			<thead>
+				<tr>
+					<th>Dom</th>
+					<th>Lun</th>
+					<th>Mar</th>
+					<th>Mié</th>
+					<th>Jue</th>
+					<th>Vie</th>
+					<th>Sáb</th>
+				</tr>
+			</thead>
+			<tbody id="calendar-body"></tbody>
+		</table>
+	</div>
+	<div class="clock">
+		<div id="clock-time"></div>
+		<div id="clock-date"></div>
+	</div>
+	<script src="app.js"></script>
+</body>
+</html>
