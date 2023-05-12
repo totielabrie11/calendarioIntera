@@ -8,7 +8,13 @@ h1 {
 	text-align: center;
 	margin-top: 30px;
 }
-
+.modal-content{
+	width: 60%;
+	margin: 0 auto;
+	background-color: #fff;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 .calendar {
 	width: 80%;
 	margin: 0 auto;
@@ -16,6 +22,34 @@ h1 {
 	padding: 20px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+.modalUs {
+	width: 40%;
+	margin: auto;
+	background-color: #fff;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.modal input{
+	width: 80%;
+}
+.modalUs {
+	display: none;
+	width: 40%;
+	margin: auto;
+	background-color: #fff;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.modal input{
+	width: 80%;
+}
+
 
 .calendar-header {
 	display: flex;
@@ -71,6 +105,26 @@ h1 {
 }
 
 #clock-date {
+	font-size: 18px;
+	margin-top: 5px;
+}
+
+.btnUs {
+	cursor: pointer;
+	position: fixed;
+	bottom: 20px;
+	left: 20px;
+	background-color: #fff;
+	padding: 10px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+#btnUs-time {
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#btnUs-date {
 	font-size: 18px;
 	margin-top: 5px;
 }
