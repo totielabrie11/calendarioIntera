@@ -41,12 +41,23 @@ function generateCalendar(year, month) {
 			row = document.createElement("tr");
 		}
 	}
-	if (row.children.length > 0) {
-		calendarBody.appendChild(row);
+	if (row.children.length < 7) {
+	    for (let i = row.children.length; i < 7; i++) {
+	        row.appendChild(document.createElement("td"));
+	    }
 	}
+	calendarBody.appendChild(row);
 
 	// Actualizamos el título del calendario con el mes y año actuales
 	calendarMonth.innerText = firstDay.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+
+	// Añadimos los listeners de los días del calendario
+	let daysContainer = document.querySelectorAll("#calendar-body td");
+	daysContainer.forEach(day => {
+		day.addEventListener("click", () => {
+			console.log(`Día seleccionado: ${day.innerText}`);
+		});
+	});
 }
 
 // Función para actualizar el reloj digital
@@ -65,13 +76,40 @@ updateClock();
 
 // Añadimos los listeners de los botones del calendario
 prevBtn.addEventListener("click", function() {
-	currentDate.setMonth(currentDate.getMonth() - 1);
-	generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    addClickEventToCells();
 });
+
 nextBtn.addEventListener("click", function() {
-	currentDate.setMonth(currentDate.getMonth() + 1);
-	generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    addClickEventToCells();
 });
+
+function addClickEventToCells() {
+    // Obtenemos los elementos td de la tabla
+    const tdElements = document.querySelectorAll("#calendar-body td");
+
+    // Agregamos el evento click a cada elemento td
+    tdElements.forEach(function(td) {
+        td.addEventListener("click", function() {
+            console.log("Clicked: " + td.innerText);
+        });
+    });
+}
+
+
+// Función para manejar el evento de clic en un día del calendario
+function handleDayClick(event) {
+	const selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), event.target.innerText);
+	console.log(`Se hizo clic en el día ${selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
+}
+
+// Generamos el calendario y actualizamos el reloj digital por primera vez
+generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+addClickEventToCells();
+updateClock();
 
 // Actualizamos el reloj digital cada segundo
 setInterval(updateClock, 1000);

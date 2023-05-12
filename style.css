@@ -14,7 +14,7 @@ h1 {
 	margin: 0 auto;
 	background-color: #fff;
 	padding: 20px;
-	box-shadow: 0 0 10px rgba(0,0,0,0.2);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .calendar-header {
@@ -41,6 +41,7 @@ h1 {
 #calendar-table {
 	width: 100%;
 	border-collapse: collapse;
+	cursor: pointer;
 }
 
 #calendar-table th,
@@ -61,7 +62,7 @@ h1 {
 	right: 20px;
 	background-color: #fff;
 	padding: 10px;
-	box-shadow: 0 0 10px rgba(0,0,0,0.2);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 #clock-time {
