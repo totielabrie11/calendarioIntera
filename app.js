@@ -102,10 +102,56 @@ function addClickEventToCells() {
 
 
 // Función para manejar el evento de clic en un día del calendario
+// Arreglo de eventos
+let events = [];
+
+// Función para manejar el evento de clic en un día del calendario
 function handleDayClick(td, year, month) {
     const selectedDate = new Date(year, month, td.innerText);
     console.log(`Se hizo clic en el día ${selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
+
+    // Creamos un objeto de evento con la fecha seleccionada
+	const newEvent = {
+		date: selectedDate,
+		day: selectedDate.getDate(),
+		month: selectedDate.getMonth() + 1,
+		year: selectedDate.getFullYear(),
+		task: ""
+	  };
+	  console.log(newEvent);
+
+    // Agregamos el objeto de evento al arreglo de eventos
+    events.push(newEvent);
+
+    // Mostramos un modal para que el usuario ingrese el contenido del evento
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Agregar evento</h2>
+            <label for="event-content">Contenido:</label>
+            <input type="text" id="event-content" name="event-content">
+            <button id="save-event-btn">Guardar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Agregamos un listener al botón de guardar para guardar el contenido del evento
+    const saveEventBtn = document.getElementById("save-event-btn");
+    saveEventBtn.addEventListener("click", () => {
+        const eventContentInput = document.getElementById("event-content");
+        newEvent.content = eventContentInput.value;
+        modal.remove();
+        nuevoEventoCreado(newEvent);
+    });
 }
+
+// Función para manejar el nuevo evento creado
+function nuevoEventoCreado(event) {
+    console.log(`Nuevo evento creado: ${event.content}`);
+    console.log(`Fecha: ${event.date.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
+}
+
 
 // Generamos el calendario y actualizamos el reloj digital por primera vez
 generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
