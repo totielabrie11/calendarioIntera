@@ -205,3 +205,21 @@ updateClock();
 setInterval(updateClock, 1000);
 
 
+// Realizar una solicitud POST al servidor
+fetch('http://localhost:3000/events', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(events)
+})
+  .then(response => {
+    if (response.ok) {
+      console.log('Evento guardado correctamente');
+    } else {
+      console.error('Error al guardar el evento');
+    }
+  })
+  .catch(error => {
+    console.error('Error al realizar la solicitud:', error);
+  });
