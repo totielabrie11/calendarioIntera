@@ -12,89 +12,86 @@ const timeFormat = new Intl.DateTimeFormat("es-ES", { hour: "numeric", minute: "
 
 // Obtenemos la fecha y hora actuales
 let currentDate = new Date();
+
 // Arreglo de eventos
 let events = [];
-setInterval(() => {
-	
-	console.log("🚀 ~ file: app.js:107 ~ events:", events)
-}, 10000); 
 
 // Función para generar el calendario para un mes y año dados
 function generateCalendar(year, month) {
-	// Limpiamos el contenido actual del calendario
-	calendarBody.innerHTML = "";
+    // Limpiamos el contenido actual del calendario
+    calendarBody.innerHTML = "";
 
-	// Creamos un nuevo objeto de fecha para el primer día del mes
-	let firstDay = new Date(year, month, 1);
+    // Creamos un nuevo objeto de fecha para el primer día del mes
+    let firstDay = new Date(year, month, 1);
 
-	// Obtenemos el número de días en el mes actual
-	let numDays = new Date(year, month + 1, 0).getDate();
+    // Obtenemos el número de días en el mes actual
+    let numDays = new Date(year, month + 1, 0).getDate();
 
-	// Creamos las filas del calendario
-	let row = document.createElement("tr");
-	for (let i = 0; i < firstDay.getDay(); i++) {
-		row.appendChild(document.createElement("td"));
-	}
-	for (let i = 1; i <= numDays; i++) {
-		let cell = document.createElement("td");
-		cell.innerText = i;
-	  
-		// Obtener la fecha actual
-		let currentCellDate = new Date(year, month, i);
-	  
-		// Buscar eventos en la fecha actual
-		const event = events.find(e => {
-		  const eDate = new Date(e.year, e.month - 1, e.day);
-		  return eDate.toDateString() === currentCellDate.toDateString();
-		});
-	  
-		if (
-		  currentDate.getFullYear() === year &&
-		  currentDate.getMonth() === month &&
-		  currentDate.getDate() === i
-		) {
-		  cell.classList.add("today");
-		}
-	  
-		// Agregar la clase "pintadoClassVerde" si hay un evento en la fecha actual
-		if (event) {
-		  cell.classList.add(event.pintado);
-		}
-	  
-		row.appendChild(cell);
-	  
-		if ((i + firstDay.getDay()) % 7 === 0) {
-		  calendarBody.appendChild(row);
-		  row = document.createElement("tr");
-		}
-	  }
-	if (row.children.length < 7) {
-	    for (let i = row.children.length; i < 7; i++) {
-	        row.appendChild(document.createElement("td"));
-	    }
-	}
-	calendarBody.appendChild(row);
+    // Creamos las filas del calendario
+    let row = document.createElement("tr");
+    for (let i = 0; i < firstDay.getDay(); i++) {
+        row.appendChild(document.createElement("td"));
+    }
+    for (let i = 1; i <= numDays; i++) {
+        let cell = document.createElement("td");
+        cell.innerText = i;
 
-	// Actualizamos el título del calendario con el mes y año actuales
-	calendarMonth.innerText = firstDay.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+        // Obtener la fecha actual
+        let currentCellDate = new Date(year, month, i);
 
-	// Añadimos los listeners de los días del calendario
-	let daysContainer = document.querySelectorAll("#calendar-body td");
-	daysContainer.forEach(day => {
-		day.addEventListener("click", () => {
-			console.log(`Día seleccionado: ${day.innerText}`);
-		});
-	});
+        // Buscar eventos en la fecha actual
+        const event = events.find(e => {
+            const eDate = new Date(e.year, e.month - 1, e.day);
+            return eDate.toDateString() === currentCellDate.toDateString();
+        });
+
+        if (
+            currentDate.getFullYear() === year &&
+            currentDate.getMonth() === month &&
+            currentDate.getDate() === i
+        ) {
+            cell.classList.add("today");
+        }
+
+        // Agregar la clase "pintadoClassVerde" si hay un evento en la fecha actual
+        if (event) {
+            cell.classList.add(event.pintado);
+        }
+
+        row.appendChild(cell);
+
+        if ((i + firstDay.getDay()) % 7 === 0) {
+            calendarBody.appendChild(row);
+            row = document.createElement("tr");
+        }
+    }
+    if (row.children.length < 7) {
+        for (let i = row.children.length; i < 7; i++) {
+            row.appendChild(document.createElement("td"));
+        }
+    }
+    calendarBody.appendChild(row);
+
+    // Actualizamos el título del calendario con el mes y año actuales
+    calendarMonth.innerText = firstDay.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+
+    // Añadimos los listeners de los días del calendario
+    let daysContainer = document.querySelectorAll("#calendar-body td");
+    daysContainer.forEach(day => {
+        day.addEventListener("click", () => {
+            console.log(`Día seleccionado: ${day.innerText}`);
+        });
+    });
 }
 
 // Función para actualizar el reloj digital
 function updateClock() {
-	// Obtenemos la fecha y hora actuales
-	currentDate = new Date();
+    // Obtenemos la fecha y hora actuales
+    currentDate = new Date();
 
-	// Actualizamos el reloj digital
-	clockTime.innerText = timeFormat.format(currentDate);
-	clockDate.innerText = dateFormat.format(currentDate);
+    // Actualizamos el reloj digital
+    clockTime.innerText = timeFormat.format(currentDate);
+    clockDate.innerText = dateFormat.format(currentDate);
 }
 
 // Generamos el calendario y actualizamos el reloj digital por primera vez
@@ -130,6 +127,34 @@ function addClickEventToCells() {
 // Creamos un objeto de mapeo para almacenar la información de clase de cada fecha
 const eventClassMap = {};
 
+function openModal(newEvent) {
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Agregar evento</h2>
+            <label for="event-content">Contenido:</label>
+            <input type="text" id="event-content" name="event-content">
+            <button id="save-event-btn">Guardar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const saveEventBtn = document.getElementById("save-event-btn");
+    saveEventBtn.addEventListener("click", function() {
+        const taskInput = document.getElementById("event-content");
+        newEvent.task = taskInput.value;
+        newEvent.pintado = "pintarVerde";
+        console.log(newEvent);
+        modal.remove();
+
+        // Volvemos a generar el calendario para reflejar el evento guardado
+        generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        addClickEventToCells(); // Agregamos nuevamente el evento de clic a las celdas del calendario
+    });
+}
+
+
 // Función para manejar el evento de clic en un día del calendario
 function handleDayClick(td, year, month) {
     const selectedDate = new Date(year, month, td.innerText);
@@ -152,33 +177,11 @@ function handleDayClick(td, year, month) {
     // Almacenamos la información de clase en el objeto de mapeo
     eventClassMap[selectedDate.toISOString().split("T")[0]] = newEvent.pintado;
 
-    // Mostramos un modal para que el usuario ingrese el contenido del evento
-    const modal = document.createElement("div");
-    modal.classList.add("modal");
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h2>Agregar evento</h2>
-            <label for="event-content">Contenido:</label>
-            <input type="text" id="event-content" name="event-content">
-            <button id="save-event-btn">Guardar</button>
-        </div>
-    `;
-    document.body.appendChild(modal);
+    openModal(newEvent);
+   
+};
 
-    // Agregamos un listener al botón de guardar para guardar el contenido del evento
-    const saveEventBtn = document.getElementById("save-event-btn");
-    saveEventBtn.addEventListener("click", function() {
-        const taskInput = document.getElementById("event-content");
-        newEvent.task = taskInput.value;
-        console.log(newEvent);
-        modal.remove();
 
-        // Volvemos a generar el calendario para reflejar los cambios
-        generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
-    });
-}
-
-// Función para manejar el nuevo evento creado
 // Función para manejar el nuevo evento creado
 function nuevoEventoCreado(event) {
     console.log(`Nuevo evento creado: ${event.task}`);
@@ -193,8 +196,6 @@ function nuevoEventoCreado(event) {
     console.log(eventDate);
 }
 
-
-
 // Generamos el calendario y actualizamos el reloj digital por primera vez
 generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
 addClickEventToCells();
@@ -202,3 +203,5 @@ updateClock();
 
 // Actualizamos el reloj digital cada segundo
 setInterval(updateClock, 1000);
+
+
