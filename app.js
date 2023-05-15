@@ -12,6 +12,12 @@ const timeFormat = new Intl.DateTimeFormat("es-ES", { hour: "numeric", minute: "
 
 // Obtenemos la fecha y hora actuales
 let currentDate = new Date();
+// Arreglo de eventos
+let events = [];
+setInterval(() => {
+	
+	console.log("🚀 ~ file: app.js:107 ~ events:", events)
+}, 10000); 
 
 // Función para generar el calendario para un mes y año dados
 function generateCalendar(year, month) {
@@ -32,15 +38,36 @@ function generateCalendar(year, month) {
 	for (let i = 1; i <= numDays; i++) {
 		let cell = document.createElement("td");
 		cell.innerText = i;
-		if (currentDate.getFullYear() === year && currentDate.getMonth() === month && currentDate.getDate() === i) {
-			cell.classList.add("today");
+	  
+		// Obtener la fecha actual
+		let currentCellDate = new Date(year, month, i);
+	  
+		// Buscar eventos en la fecha actual
+		const event = events.find(e => {
+		  const eDate = new Date(e.year, e.month - 1, e.day);
+		  return eDate.toDateString() === currentCellDate.toDateString();
+		});
+	  
+		if (
+		  currentDate.getFullYear() === year &&
+		  currentDate.getMonth() === month &&
+		  currentDate.getDate() === i
+		) {
+		  cell.classList.add("today");
 		}
+	  
+		// Agregar la clase "pintadoClassVerde" si hay un evento en la fecha actual
+		if (event) {
+		  cell.classList.add(event.pintado);
+		}
+	  
 		row.appendChild(cell);
+	  
 		if ((i + firstDay.getDay()) % 7 === 0) {
-			calendarBody.appendChild(row);
-			row = document.createElement("tr");
+		  calendarBody.appendChild(row);
+		  row = document.createElement("tr");
 		}
-	}
+	  }
 	if (row.children.length < 7) {
 	    for (let i = row.children.length; i < 7; i++) {
 	        row.appendChild(document.createElement("td"));
@@ -100,58 +127,72 @@ function addClickEventToCells() {
     });
 }
 
+// Creamos un objeto de mapeo para almacenar la información de clase de cada fecha
+const eventClassMap = {};
 
-// Función para manejar el evento de clic en un día del calendario
-// Arreglo de eventos
-let events = [];
-
-// Función para manejar el evento de clic en un día del calendario
 // Función para manejar el evento de clic en un día del calendario
 function handleDayClick(td, year, month) {
     const selectedDate = new Date(year, month, td.innerText);
     console.log(`Se hizo clic en el día ${selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
 
     // Creamos un objeto de evento con la fecha seleccionada
-	const newEvent = {
-		date: selectedDate,
-		day: selectedDate.getDate(),
-		month: selectedDate.getMonth() + 1,
-		year: selectedDate.getFullYear(),
-		task: ""
-	};
-	console.log(newEvent);
+    const newEvent = {
+        date: selectedDate,
+        day: selectedDate.getDate(),
+        month: selectedDate.getMonth() + 1,
+        year: selectedDate.getFullYear(),
+        task: "",
+        pintado: "pintarVerde" // Actualizamos el valor de pintado
+    };
+    console.log(newEvent);
 
-	// Agregamos el objeto de evento al arreglo de eventos
-	events.push(newEvent);
+    // Agregamos el objeto de evento al arreglo de eventos
+    events.push(newEvent);
 
-	// Mostramos un modal para que el usuario ingrese el contenido del evento
-	const modal = document.createElement("div");
-	modal.classList.add("modal");
-	modal.innerHTML = `
-		<div class="modal-content">
-			<h2>Agregar evento</h2>
-			<label for="event-content">Contenido:</label>
-			<input type="text" id="event-content" name="event-content">
-			<button id="save-event-btn">Guardar</button>
-		</div>
-	`;
-	document.body.appendChild(modal);
+    // Almacenamos la información de clase en el objeto de mapeo
+    eventClassMap[selectedDate.toISOString().split("T")[0]] = newEvent.pintado;
 
-	// Agregamos un listener al botón de guardar para guardar el contenido del evento
-	const saveEventBtn = document.getElementById("save-event-btn");
-	saveEventBtn.addEventListener("click", function() {
-		const taskInput = document.getElementById("event-content");
-		newEvent.task = taskInput.value;
-		console.log(newEvent);
-		modal.remove();
-	});
+    // Mostramos un modal para que el usuario ingrese el contenido del evento
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Agregar evento</h2>
+            <label for="event-content">Contenido:</label>
+            <input type="text" id="event-content" name="event-content">
+            <button id="save-event-btn">Guardar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Agregamos un listener al botón de guardar para guardar el contenido del evento
+    const saveEventBtn = document.getElementById("save-event-btn");
+    saveEventBtn.addEventListener("click", function() {
+        const taskInput = document.getElementById("event-content");
+        newEvent.task = taskInput.value;
+        console.log(newEvent);
+        modal.remove();
+
+        // Volvemos a generar el calendario para reflejar los cambios
+        generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    });
 }
 
 // Función para manejar el nuevo evento creado
+// Función para manejar el nuevo evento creado
 function nuevoEventoCreado(event) {
-    console.log(`Nuevo evento creado: ${event.content}`);
+    console.log(`Nuevo evento creado: ${event.task}`);
     console.log(`Fecha: ${event.date.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
+
+    // Almacenar la fecha actual en eventDate
+    const eventDate = new Date();
+
+    // Generar el calendario y actualizar la celda correspondiente
+    generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
+
+    console.log(eventDate);
 }
+
 
 
 // Generamos el calendario y actualizamos el reloj digital por primera vez
