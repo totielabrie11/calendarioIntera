@@ -151,6 +151,8 @@ function openModal(newEvent) {
         // Volvemos a generar el calendario para reflejar el evento guardado
         generateCalendar(currentDate.getFullYear(), currentDate.getMonth());
         addClickEventToCells(); // Agregamos nuevamente el evento de clic a las celdas del calendario
+       
+        enviarEventoDb(newEvent)
     });
 }
 
@@ -204,22 +206,25 @@ updateClock();
 // Actualizamos el reloj digital cada segundo
 setInterval(updateClock, 1000);
 
-
+function enviarEventoDb(newEvent){
 // Realizar una solicitud POST al servidor
-fetch('http://localhost:3000/events', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(events)
-})
-  .then(response => {
-    if (response.ok) {
-      console.log('Evento guardado correctamente');
-    } else {
-      console.error('Error al guardar el evento');
-    }
-  })
-  .catch(error => {
-    console.error('Error al realizar la solicitud:', error);
-  });
+
+    fetch('http://localhost:3000/usuarios', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newEvent)
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Usuario agregado:', data);
+    alert('Usuario agregado correctamente.');
+    // Aquí puedes realizar acciones adicionales después de agregar el usuario
+    })
+    .catch(error => {
+    console.error('Error al agregar el usuario:', error);
+    alert('Ocurrió un error al agregar el usuario. Por favor, revisa la consola para más información.');
+    });
+
+}

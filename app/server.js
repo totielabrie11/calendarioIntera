@@ -1,47 +1,67 @@
 const express = require('express');
-const cors = require('cors');
 const fs = require('fs');
-
-// Habilitar CORS
+const cors = require('cors');
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
-// Verificar si el archivo db.json existe, de lo contrario, crearlo
-if (!fs.existsSync('db.json')) {
-  fs.writeFileSync('db.json', JSON.stringify({ events: [] }), 'utf8');
+const PORT = 3000;
+
+app.use(express.json());
+
+const dbFile = 'db.json';
+
+
+  
+  app.use(cors());
+
+// Verificar si el archivo db.json existe, si no, crearlo
+if (!fs.existsSync(dbFile)) {
+  fs.writeFileSync(dbFile, '[]', 'utf8');
 }
 
-// Leer el contenido del archivo db.json al iniciar el servidor
-const dbData = fs.readFileSync('db.json', 'utf8');
-const { events } = JSON.parse(dbData);
+let nextId = 1;
 
-// Ruta para obtener todos los eventos
-app.get('/events', (req, res) => {
-  res.json(events);
-});
+app.post('/usuarios', (req, res) => {
+  // Obtener el nuevo usuario del cuerpo de la solicitud
+  const nuevoUsuario = req.body;
+  nuevoUsuario.id = nextId++;
 
-// Ruta para crear o actualizar eventos en el archivo db.json
-app.post('/events', (req, res) => {
-  const eventData = req.body;
-
-  events.push(eventData);
-
-  // Guardar el array de eventos en el archivo db.json
-  fs.writeFile('db.json', JSON.stringify({ events }), 'utf8', err => {
+  // Leer el contenido actual del archivo db.json
+  fs.readFile(dbFile, 'utf8', (err, data) => {
     if (err) {
-      console.error('Error al guardar el evento:', err);
-      res.status(500).json({ error: 'Error al guardar el evento' });
-    } else {
-      console.log('Evento guardado correctamente');
-      res.sendStatus(200);
+      console.error(err);
+      return res.status(500).json({ error: 'Error al leer la base de datos.' });
     }
+
+    let usuarios = [];
+
+    try {
+      // Parsear el contenido actual del archivo a un array
+      usuarios = JSON.parse(data);
+    } catch (parseError) {
+      console.error(parseError);
+      return res.status(500).json({ error: 'Error al parsear la base de datos.' });
+    }
+
+    // Agregar el nuevo usuario al array
+    usuarios.push(nuevoUsuario);
+
+    // Convertir el array actualizado a JSON
+    const usuariosJSON = JSON.stringify(usuarios, null, 2);
+
+    // Escribir el JSON en el archivo db.json
+    fs.writeFile(dbFile, usuariosJSON, (writeErr) => {
+      if (writeErr) {
+        console.error(writeErr);
+        return res.status(500).json({ error: 'Error al escribir en la base de datos.' });
+      }
+
+      // Responder con el nuevo usuario agregado
+      res.json(nuevoUsuario);
+    });
   });
 });
 
-// Iniciar el servidor
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Servidor escuchando en el puerto ${port}`);
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
