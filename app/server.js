@@ -10,16 +10,22 @@ app.use(express.json());
 
 const dbFile = 'db.json';
 
+app.use(cors());
 
-  
-  app.use(cors());
+let nextId = 1; // Mover la declaración de nextId aquí
 
 // Verificar si el archivo db.json existe, si no, crearlo
 if (!fs.existsSync(dbFile)) {
   fs.writeFileSync(dbFile, '[]', 'utf8');
+} else {
+  // Leer el contenido actual del archivo db.json al iniciar la aplicación
+  const usuarios = JSON.parse(fs.readFileSync(dbFile, 'utf8'));
+  if (usuarios.length > 0) {
+    // Obtener el último ID y establecer nextId en el siguiente valor
+    const lastId = usuarios[usuarios.length - 1].id;
+    nextId = lastId + 1;
+  }
 }
-
-let nextId = 1;
 
 app.post('/usuarios', (req, res) => {
   // Obtener el nuevo usuario del cuerpo de la solicitud
