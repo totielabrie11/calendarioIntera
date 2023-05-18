@@ -6,6 +6,25 @@ const nextBtn = document.getElementById("next-btn");
 const clockTime = document.getElementById("clock-time");
 const clockDate = document.getElementById("clock-date");
 
+function obtenerDatosDB() {
+    const xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            const parsedEvents = JSON.parse(this.responseText);
+            events = parsedEvents;
+            console.log("🚀 ~ file: app.js:25 ~ obtenerDatosDB ~ events:", events);
+           
+        } else if (this.readyState === 4 && this.status !== 200) {
+            console.error('Error al obtener los datos del archivo db.json');
+        }
+    };
+
+    xhttp.open('GET', 'app/db.json', true);
+    xhttp.send();
+}
+obtenerDatosDB();
+
 // Configuramos el formato de fecha y hora
 const dateFormat = new Intl.DateTimeFormat("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 const timeFormat = new Intl.DateTimeFormat("es-ES", { hour: "numeric", minute: "numeric", second: "numeric" });
