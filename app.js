@@ -6,24 +6,23 @@ const nextBtn = document.getElementById("next-btn");
 const clockTime = document.getElementById("clock-time");
 const clockDate = document.getElementById("clock-date");
 
-function obtenerDatosDB() {
-    const xhttp = new XMLHttpRequest();
+async function obtenerDatosDB() {
+  try {
+    const response = await fetch('app/db.json');
+    if (response.ok) {
+      const parsedEvents = await response.json();
+      events = parsedEvents;
+      console.log("🚀 ~ file: app.js:25 ~ obtenerDatosDB ~ events:", events);
 
-    xhttp.onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            const parsedEvents = JSON.parse(this.responseText);
-            events = parsedEvents;
-            console.log("🚀 ~ file: app.js:25 ~ obtenerDatosDB ~ events:", events);
-           
-            //generateCalendar(); // Llamamos a generateCalendar una vez que se obtengan los eventos
-        } else if (this.readyState === 4 && this.status !== 200) {
-            console.error('Error al obtener los datos del archivo db.json');
-        }
-    };
-
-    xhttp.open('GET', 'app/db.json', true);
-    xhttp.send();
+      //generateCalendar(); // Llamamos a generateCalendar una vez que se obtengan los eventos
+    } else {
+      console.error('Error al obtener los datos del archivo db.json');
+    }
+  } catch (error) {
+    console.error('Error al obtener los datos del archivo db.json:', error);
+  }
 }
+
 obtenerDatosDB();
 
 // Configuramos el formato de fecha y hora
@@ -200,21 +199,23 @@ function openModal(newEvent) {
 
 
 // Función para manejar el evento de clic en un día del calendario
+// Función para manejar el evento de clic en un día del calendario
 function handleDayClick(td, year, month) {
-    const selectedDate = new Date(year, month, td.innerText);
-    console.log(`Se hizo clic en el día ${selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
+  const selectedDate = new Date(year, month, td.innerText);
+  console.log(`Se hizo clic en el día ${selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
 
-    // Creamos un objeto de evento con la fecha seleccionada
-    const newEvent = {
-        date: selectedDate,
-        day: selectedDate.getDate(),
-        month: selectedDate.getMonth() + 1,
-        year: selectedDate.getFullYear(),
-        task: "",
-        pintado: "pintarVerde" // Actualizamos el valor de pintado
-    };
-    console.log(newEvent);
+  // Creamos un objeto de evento con la fecha seleccionada
+  const newEvent = {
+    date: selectedDate,
+    day: selectedDate.getDate(),
+    month: selectedDate.getMonth() + 1,
+    year: selectedDate.getFullYear(),
+    task: "",
+    pintado: "pintarVerde" // Actualizamos el valor de pintado
+  };
 
+  // Validar los datos del nuevo evento antes de agregarlo
+  if (validarDatosEvento(newEvent)) {
     // Agregamos el objeto de evento al arreglo de eventos
     events.push(newEvent);
 
@@ -222,9 +223,65 @@ function handleDayClick(td, year, month) {
     eventClassMap[selectedDate.toISOString().split("T")[0]] = newEvent.pintado;
 
     openModal(newEvent);
-   
-};
+  }
+}
 
+
+// Función para validar los datos del nuevo evento
+function validarDatosEvento(newEvent) {
+  // Verificar que se haya proporcionado un valor para la fecha del evento
+  if (!newEvent.date) {
+    alert("La fecha del evento es obligatoria.");
+    return false;
+  }
+
+  // Verificar que la fecha no sea en el pasado
+  const currentDate = new Date();
+  if (newEvent.date < currentDate) {
+    alert("La fecha del evento no puede ser en el pasado.");
+    return false;
+  }
+
+  // Verificar que no exista un evento con la misma fecha
+  const existingEvent = events.find((event) => {
+    const eventDate = new Date(event.year, event.month - 1, event.day);
+    return eventDate.toDateString() === newEvent.date.toDateString();
+  });
+
+  if (existingEvent) {
+    alert("Ya existe un evento en la fecha seleccionada.");
+    return false;
+  }
+
+  return true; // Los datos son válidos
+}
+
+// Función para manejar el evento de clic en un día del calendario
+function handleDayClick(td, year, month) {
+  const selectedDate = new Date(year, month, td.innerText);
+  console.log(`Se hizo clic en el día ${selectedDate.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`);
+
+  // Creamos un objeto de evento con la fecha seleccionada
+  const newEvent = {
+    date: selectedDate,
+    day: selectedDate.getDate(),
+    month: selectedDate.getMonth() + 1,
+    year: selectedDate.getFullYear(),
+    task: "",
+    pintado: "pintarVerde" // Actualizamos el valor de pintado
+  };
+
+  // Validar los datos del nuevo evento antes de agregarlo
+  if (validarDatosEvento(newEvent)) {
+    // Agregamos el objeto de evento al arreglo de eventos
+    events.push(newEvent);
+
+    // Almacenamos la información de clase en el objeto de mapeo
+    eventClassMap[selectedDate.toISOString().split("T")[0]] = newEvent.pintado;
+
+    openModal(newEvent);
+  }
+}
 
 // Función para manejar el nuevo evento creado
 function nuevoEventoCreado(event) {
