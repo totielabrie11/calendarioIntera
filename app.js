@@ -15,6 +15,7 @@ function obtenerDatosDB() {
             events = parsedEvents;
             console.log("🚀 ~ file: app.js:25 ~ obtenerDatosDB ~ events:", events);
            
+             generateCalendar(); // Llamamos a generateCalendar una vez que se obtengan los eventos
         } else if (this.readyState === 4 && this.status !== 200) {
             console.error('Error al obtener los datos del archivo db.json');
         }
@@ -36,72 +37,94 @@ let currentDate = new Date();
 let events = [];
 
 // Función para generar el calendario para un mes y año dados
-function generateCalendar(year, month) {
+function generateCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+  
     // Limpiamos el contenido actual del calendario
     calendarBody.innerHTML = "";
-
+  
     // Creamos un nuevo objeto de fecha para el primer día del mes
     let firstDay = new Date(year, month, 1);
-
+  
     // Obtenemos el número de días en el mes actual
     let numDays = new Date(year, month + 1, 0).getDate();
-
+  
     // Creamos las filas del calendario
     let row = document.createElement("tr");
     for (let i = 0; i < firstDay.getDay(); i++) {
-        row.appendChild(document.createElement("td"));
+      row.appendChild(document.createElement("td"));
     }
     for (let i = 1; i <= numDays; i++) {
-        let cell = document.createElement("td");
-        cell.innerText = i;
-
-        // Obtener la fecha actual
-        let currentCellDate = new Date(year, month, i);
-
-        // Buscar eventos en la fecha actual
-        const event = events.find(e => {
-            const eDate = new Date(e.year, e.month - 1, e.day);
-            return eDate.toDateString() === currentCellDate.toDateString();
-        });
-
-        if (
-            currentDate.getFullYear() === year &&
-            currentDate.getMonth() === month &&
-            currentDate.getDate() === i
-        ) {
-            cell.classList.add("today");
-        }
-
-        // Agregar la clase "pintadoClassVerde" si hay un evento en la fecha actual
-        if (event) {
-            cell.classList.add(event.pintado);
-        }
-
-        row.appendChild(cell);
-
-        if ((i + firstDay.getDay()) % 7 === 0) {
-            calendarBody.appendChild(row);
-            row = document.createElement("tr");
-        }
+      let cell = document.createElement("td");
+      cell.innerText = i;
+  
+      // Obtener la fecha actual
+      let currentCellDate = new Date(year, month, i);
+  
+      // Buscar eventos en la fecha actual
+      const event = events.find(e => {
+        const eDate = new Date(e.year, e.month - 1, e.day);
+        return eDate.toDateString() === currentCellDate.toDateString();
+      });
+  
+      if (
+        currentDate.getFullYear() === year &&
+        currentDate.getMonth() === month &&
+        currentDate.getDate() === i
+      ) {
+        cell.classList.add("today");
+      }
+  
+      // Agregar la clase "pintadoClassVerde" si hay un evento en la fecha actual
+      if (event) {
+        cell.classList.add(event.pintado);
+      }
+  
+      row.appendChild(cell);
+  
+      if ((i + firstDay.getDay()) % 7 === 0) {
+        calendarBody.appendChild(row);
+        row = document.createElement("tr");
+      }
     }
     if (row.children.length < 7) {
-        for (let i = row.children.length; i < 7; i++) {
-            row.appendChild(document.createElement("td"));
-        }
+      for (let i = row.children.length; i < 7; i++) {
+        row.appendChild(document.createElement("td"));
+      }
     }
     calendarBody.appendChild(row);
-
+  
     // Actualizamos el título del calendario con el mes y año actuales
     calendarMonth.innerText = firstDay.toLocaleDateString("es-ES", { month: "long", year: "numeric" });
-
     // Añadimos los listeners de los días del calendario
     let daysContainer = document.querySelectorAll("#calendar-body td");
     daysContainer.forEach(day => {
-        day.addEventListener("click", () => {
-            console.log(`Día seleccionado: ${day.innerText}`);
-        });
+      day.addEventListener("click", () => {
+        console.log(`Día seleccionado: ${day.innerText}`);
+      });
     });
-}
+  
+    // Iteramos sobre los eventos obtenidos mediante la llamada AJAX
+    events.forEach(event => {
+      const { date } = event;
+      const eventDate = new Date(date);
+      const eventDateString = eventDate.toISOString().split("T")[0];
+      const dayElement = document.querySelector(`[data-date="${eventDateString}"]`);
+  
+      console.log("Fecha del evento:", eventDateString);
+      console.log("Elemento del día correspondiente:", dayElement);
+  
+      if (dayElement) {
+        console.log("Aplicando clase 'pintarVerde' al día:", eventDateString);
+        dayElement.classList.add("pintarVerde");
+      } else {
+        console.log("No se encontró el día correspondiente:", eventDateString);
+      }
+    });
+  }
+  
+
 
 // Función para actualizar el reloj digital
 function updateClock() {

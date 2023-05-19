@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 
@@ -26,6 +27,8 @@ if (!fs.existsSync(dbFile)) {
     nextId = lastId + 1;
   }
 }
+
+app.use(express.static(path.join(__dirname, '../cliente')));
 
 app.post('/usuarios', (req, res) => {
   // Obtener el nuevo usuario del cuerpo de la solicitud
