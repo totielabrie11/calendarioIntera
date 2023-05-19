@@ -15,7 +15,7 @@ function obtenerDatosDB() {
             events = parsedEvents;
             console.log("🚀 ~ file: app.js:25 ~ obtenerDatosDB ~ events:", events);
            
-             generateCalendar(); // Llamamos a generateCalendar una vez que se obtengan los eventos
+            //generateCalendar(); // Llamamos a generateCalendar una vez que se obtengan los eventos
         } else if (this.readyState === 4 && this.status !== 200) {
             console.error('Error al obtener los datos del archivo db.json');
         }
@@ -251,7 +251,7 @@ setInterval(updateClock, 1000);
 function enviarEventoDb(newEvent){
 // Realizar una solicitud POST al servidor
 
-    fetch('http://localhost:3000/usuarios', {
+    fetch('http://localhost:3000/events', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
